@@ -1,4 +1,5 @@
 import React, {Component} from 'react'
+import {Redirect} from 'react-router-dom'
 import {
     Form,
     Input,
@@ -11,7 +12,7 @@ const Item = Form.Item
 /*
 登录组件
 */
-class Login extends Component {
+class LoginForm extends Component {
 
     handleSubmit = (event) => {
         // 阻止事件的默认行为
@@ -25,8 +26,10 @@ class Login extends Component {
                 console.log('提交登录请求', username, password)
                 if (username === 'admin' && password === '123456') {
                     // 提示登录成功
+                    window.localStorage.setItem('loggedIn', true);
                     message.success('登录成功')
                     // 跳转到管理界面 (不需要再回退回到登陆)
+                    window.location.href = '/#/';
                     // this.props.history.replace('/')
                 } else { // 登录失败
                     // 提示错误信息
@@ -73,11 +76,7 @@ class Login extends Component {
         const { getFieldDecorator } = this.props.form;
 
         return (
-            <div className='login'>
-                <header className='login-header'>
-                    <img src={logo} alt="logo"/>
-                    <h1>React admin后台管理系统</h1>
-                </header>
+            <div >
                 <section className='login-content'>
                     <h3>用户登陆</h3>
                     <Form onSubmit={this.handleSubmit} className="login-form">
@@ -141,5 +140,32 @@ class Login extends Component {
 包装Form组件生成一个新的组件: Form(Login)
 新组件会向Form组件传递一个强大的对象属性: form
  */
-const WrapLogin = Form.create()(Login)
-export default WrapLogin
+ LoginForm = Form.create()(LoginForm)
+
+class Login extends Component {
+
+    render() {
+        const loggedIn = window.localStorage.getItem('loggedIn');
+        // 如果内存没有存储user ==> 当前没有登陆
+        if(loggedIn) {
+            // 自动跳转到登陆(在render()中)
+            return <Redirect to='/'/>
+        }
+        return (
+                <div className='login'>
+                    <header className='login-header'>
+                        <img src={logo} alt="logo"/>
+                        <h1>React admin后台管理系统</h1>
+                    </header>
+                    <LoginForm />
+                </div>
+        );
+    }
+}
+
+export default Login;
+
+
+
+
+
