@@ -8,7 +8,11 @@ import {
 } from 'antd'
 import './login.less'
 import logo from '../../assets/images/logo.svg'
+import memoryUtils from '../../utils/memoryUtils'
+import storageUtils from '../../utils/storageUtils'
+
 const Item = Form.Item
+
 /*
 登录组件
 */
@@ -26,9 +30,12 @@ class LoginForm extends Component {
                 console.log('提交登录请求', username, password)
                 if (username === 'admin' && password === '123456') {
                     // 提示登录成功
-                    window.localStorage.setItem('loggedIn', true);
+                    const user ={'id':1,'name':username};
+                    console.log(user);
                     message.success('登录成功')
-                    // 跳转到管理界面 (不需要再回退回到登陆)
+                    storageUtils.saveUser(user)
+                    // 保存用户登录信息
+                    memoryUtils.user = user;
                     window.location.href = '/#/';
                     // this.props.history.replace('/')
                 } else { // 登录失败
@@ -145,12 +152,12 @@ class LoginForm extends Component {
 class Login extends Component {
 
     render() {
-        const loggedIn = window.localStorage.getItem('loggedIn');
-        // 如果内存没有存储user ==> 当前没有登陆
-        if(loggedIn) {
-            // 自动跳转到登陆(在render()中)
+        // 如果用户已经登陆, 自动跳转到管理界面
+        const user = memoryUtils.user
+        if(user && user.id) {
             return <Redirect to='/'/>
         }
+
         return (
                 <div className='login'>
                     <header className='login-header'>
